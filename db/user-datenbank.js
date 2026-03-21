@@ -5,7 +5,6 @@ import path from "path";
 const dbPath = path.resolve("db/user.db");
 const db = new Database(dbPath);
 
-// Tabelle erstellen
 db.prepare(`
     CREATE TABLE IF NOT EXISTS users (
         session TEXT PRIMARY KEY,

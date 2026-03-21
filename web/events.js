@@ -1,26 +1,27 @@
+// web/events.js
 import express from "express";
 
-export const sseRouter = express.Router();
 export const currentPlayers = new Set();
-let clients = [];
+const clients = new Set();
+
+export const sseRouter = express.Router();
 
 sseRouter.get("/players", (req, res) => {
     res.setHeader("Content-Type", "text/event-stream");
     res.setHeader("Cache-Control", "no-cache");
     res.setHeader("Connection", "keep-alive");
 
-    const client = { res };
-    clients.push(client);
+    clients.add(res);
+
+    res.write(`event: players\ndata: ${JSON.stringify({ players: [...currentPlayers] })}\n\n`);
 
     req.on("close", () => {
-        clients = clients.filter(c => c !== client);
+        clients.delete(res);
     });
 });
 
-export function broadcastPlayers(players) {
-    const payload = JSON.stringify({ players });
-
-    for (const c of clients) {
-        c.res.write(`event: players\ndata: ${payload}\n\n`);
+export function broadcastPlayers(data) {
+    for (const client of clients) {
+        client.write(`event: players\ndata: ${JSON.stringify(data)}\n\n`);
     }
 }

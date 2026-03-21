@@ -5,7 +5,7 @@ import { broadcastPlayers, currentPlayers } from "./events.js";
 
 const router = express.Router();
 
-// Spieler-Webhook (join/quit)
+// Spieler-Webhook
 router.post("/", (req, res) => {
     const { password, action, player, online } = req.body;
 
@@ -26,31 +26,19 @@ router.post("/", (req, res) => {
     res.sendStatus(200);
 });
 
-// NEUE ROUTE: Datenpaket empfangen
+// Datenpaket-Webhook
 router.post("/data", (req, res) => {
     const { pw, ip, data, new_pw } = req.body;
 
     const realPassword = serverDB.getPassword();
 
-    // Passwort prüfen
     if (!pw || pw !== realPassword) {
         return res.status(403).json({ error: "Ungültiges Passwort" });
     }
 
-    // IP speichern
-    if (ip) {
-        serverDB.setIP(ip);
-    }
-
-    // Daten speichern (z. B. "neuespw123,.:altespw123")
-    if (data) {
-        serverDB.setData(data);
-    }
-
-    // Passwort ändern
-    if (new_pw) {
-        serverDB.setPassword(new_pw);
-    }
+    if (ip) serverDB.setIP(ip);
+    if (data) serverDB.setData(data);
+    if (new_pw) serverDB.setPassword(new_pw);
 
     res.json({
         ok: true,
