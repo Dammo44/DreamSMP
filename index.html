@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DreamSMP</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html" class="logo">DreamSMP</a>
+    <ul class="nav-links">
+        <li><a href="#" id="portalLink">Login</a></li>
+        <li><a href="#">Welt</a></li>
+        <li><a href="#">Gilde</a></li>
+        <li><a href="regeln.html">Regeln</a></li>
+    </ul>
+</nav>
+
+<header class="hero">
+    <img src="info/server-icon.png" alt="Server Icon"
+         style="width:150px;height:150px;border-radius:20px;box-shadow:0 0 25px #00ffee;margin-bottom:20px;">
+    <h1>Willkommen bei DreamSMP</h1>
+    <p>Betrete eine Welt voller Licht, Geheimnisse und Cyan-Magie.</p>
+
+    <div class="btn-row">
+        <button class="btn outline">Ausrüstung prüfen</button>
+        <button class="btn danger">Gefahrenscan</button>
+    </div>
+</header>
+
+<section class="section">
+    <h2>Minecraft Server Status</h2>
+    <div class="card" id="serverStatus">
+        <p>Server wird abgefragt...</p>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Online Spieler</h2>
+    <div class="card">
+        <table id="playerTable">
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+            </tr>
+            <tr>
+                <td colspan="2">Warte auf Live-Daten...</td>
+            </tr>
+        </table>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Aktive Quests</h2>
+    <div class="card-grid">
+        <div class="card quest">
+            <h3>Quest: Die Cyan-Quelle</h3>
+            <p>Finde die Quelle des Neon-Lichts, das die Welt speist.</p>
+            <button class="btn neon">Quest starten</button>
+        </div>
+        <div class="card quest">
+            <h3>Quest: Schatten im Code</h3>
+            <p>Untersuche die dunklen Datenströme im Untergrund.</p>
+            <button class="btn outline">Untersuchen</button>
+        </div>
+    </div>
+</section>
+
+<section class="section">
+    <h2>Statusmeldungen</h2>
+    <div class="alert success">Erfolg: Energiefluss stabil.</div>
+    <div class="alert warning">Warnung: Unbekannte Signale entdeckt.</div>
+    <div class="alert error">Fehler: Portalinstabilität erkannt.</div>
+</section>
+
+<footer class="footer">
+    © 2026 DreamSMP – Neon Adventure
+</footer>
+
+<script>
+    const BACKEND = "https://dreamsmp.onrender.com";
+    const SESSION_KEY = "dreamsmp_web_session";
+
+    function getSession() {
+        return localStorage.getItem(SESSION_KEY);
+    }
+
+    function setSession(session) {
+        localStorage.setItem(SESSION_KEY, session);
+    }
+
+    function clearSession() {
+        localStorage.removeItem(SESSION_KEY);
+    }
+
+    async function createLinkRequest() {
+        const res = await fetch(BACKEND + "/auth/create", { method: "POST" });
+        if (!res.ok) throw new Error("auth/create failed");
+        return await res.json(); // { session, id }
+    }
+
+    async function getStatus(session) {
+        const res = await fetch(BACKEND + "/auth/status?session=" + encodeURIComponent(session));
+        if (!res.ok) return { linked: false };
+        return await res.json();
+    }
+
+    async function logoutSession(session) {
+        await fetch(BACKEND + "/auth/logout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ session })
+        });
+    }
+
+    function setPortalAsLogin() {
+        const a = document.getElementById("portalLink");
+        a.textContent = "Login";
+        a.onclick = async (ev) => {
+            ev.preventDefault();
+            try {
+                const data = await createLinkRequest();
+                setSession(data.session);
+                alert("Deine Verknüpfungs-ID: " + data.id + "\nNutze im Spiel: /web link " + data.id);
+                await refreshAuthUi();
+            } catch (e) {
+                alert("Login konnte nicht gestartet werden.");
+            }
+        };
+    }
+
+    function setPortalAsLogout(playerName, session) {
+        const a = document.getElementById("portalLink");
+        a.textContent = "Logout (" + playerName + ")";
+        a.onclick = async (ev) => {
+            ev.preventDefault();
+            try {
+                await logoutSession(session);
+            } finally {
+                clearSession();
+                await refreshAuthUi();
+            }
+        };
+    }
+
+    async function refreshAuthUi() {
+        const session = getSession();
+        if (!session) {
+            setPortalAsLogin();
+            return;
+        }
+
+        const status = await getStatus(session);
+        if (status.linked) {
+            setPortalAsLogout(status.player || "Verifiziert", session);
+        } else {
+            const a = document.getElementById("portalLink");
+            a.textContent = "Login";
+            a.onclick = async (ev) => {
+                ev.preventDefault();
+                alert("Noch nicht verifiziert. Nutze im Spiel: /web link " + (status.id || "<id>"));
+            };
+        }
+    }
+
+    function renderPlayers(payload) {
+        const table = document.getElementById("playerTable");
+        table.innerHTML = `
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+            </tr>
+        `;
+
+        const players = Array.isArray(payload.players) ? payload.players : [];
+        if (players.length === 0) {
+            table.innerHTML += `<tr><td colspan="2">Keine Spieler online</td></tr>`;
+            return;
+        }
+
+        for (const name of players) {
+            table.innerHTML += `
+                <tr>
+                    <td>${name}</td>
+                    <td><span class="badge green">Online</span></td>
+                </tr>
+            `;
+        }
+    }
+
+    function startPlayerStream() {
+        const evt = new EventSource(BACKEND + "/events/players");
+        evt.addEventListener("players", (e) => {
+            try {
+                const payload = JSON.parse(e.data);
+                renderPlayers(payload);
+            } catch (_) {}
+        });
+    }
+
+    async function checkServer() {
+        const statusBox = document.getElementById("serverStatus");
+        try {
+            const response = await fetch("https://api.mcsrvstat.us/2/Nexa.free-url.es:19154");
+            const data = await response.json();
+
+            if (!data || data.online === false) {
+                statusBox.innerHTML = `<p style="font-weight:bold;">Server offline oder nicht erreichbar</p>`;
+                return;
+            }
+
+            statusBox.innerHTML = `
+                <p><strong>Status:</strong> Online</p>
+                <p><strong>Version:</strong> ${data.version || "Unbekannt"}</p>
+                <p><strong>Spieler:</strong> ${data.players?.online || 0} / ${data.players?.max || "?"}</p>
+                <p><strong>Server-Nachricht:</strong><br>${data.motd?.clean?.join("<br>") || "Keine Nachricht vorhanden"}</p>
+            `;
+        } catch (_) {
+            statusBox.innerHTML = `<p style="font-weight:bold;">Fehler beim Abrufen des Serverstatus</p>`;
+        }
+    }
+
+    (async function init() {
+        await refreshAuthUi();
+        startPlayerStream();
+        checkServer();
+    })();
+</script>
+
+</body>
+</html>
