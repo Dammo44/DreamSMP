@@ -8,14 +8,14 @@
 </head>
 <body>
 
-    <!-- Container für Taskbar -->
+    <!-- Taskbar -->
     <div id="taskbar"></div>
 
-    <!-- Container für die Page -->
+    <!-- Page -->
     <div id="page"></div>
 
     <script>
-        // Lädt eine HTML-Datei in ein Ziel-Element
+        // HTML Loader
         async function loadInto(targetId, file) {
             try {
                 const res = await fetch(file);
@@ -30,11 +30,8 @@
         // Taskbar laden
         loadInto("taskbar", "assets/taskbar.html");
 
-        // Standard-Page laden (Home)
+        // Standardseite: Home
         loadInto("page", "pages/home.html");
-
-        // Packed wird nicht direkt geladen,
-        // aber steht für Seiten zur Verfügung (z.B. rules.html lädt regeln.txt)
     </script>
 
 </body>

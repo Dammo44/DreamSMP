@@ -1,23 +1,10 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DreamSMP – Taskbar</title>
-    <link rel="stylesheet" href="../style.css">
-</head>
-<body>
+<nav class="navbar taskbar">
+    <a class="logo" onclick="loadInto('page', 'pages/home.html')">DreamSMP</a>
 
-    <!-- Taskbar -->
-    <nav class="navbar taskbar">
-        <div class="logo">DreamSMP</div>
-        <ul class="nav-links">
-            <li><a href="../index.html">Portal</a></li>
-            <li><a href="#">Welt</a></li>
-            <li><a href="#">Gilde</a></li>
-            <li><a href="../regeln.html">Regeln</a></li>
-        </ul>
-    </nav>
-
-</body>
-</html>
+    <ul class="nav-links">
+        <li><a onclick="loadInto('page', 'pages/home.html')">Portal</a></li>
+        <li><a onclick="loadInto('page', 'pages/world.html')">Welt</a></li>
+        <li><a onclick="loadInto('page', 'pages/guild.html')">Gilde</a></li>
+        <li><a onclick="loadInto('page', 'pages/rules.html')">Regeln</a></li>
+    </ul>
+</nav>
