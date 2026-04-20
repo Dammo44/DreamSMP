@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DreamSMP – Regeln</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+    <!-- Taskbar wird später dynamisch geladen -->
+
+    <header class="hero">
+        <h1>📜 Regelwerk</h1>
+        <p>Die offiziellen Regeln des DreamSMP.</p>
+    </header>
+
+    <section class="section" id="rulesContainer" style="text-align:center;">
+        <!-- Regeln werden per JS geladen -->
+    </section>
+
+    <footer class="footer">
+        © 2026 DreamSMP – Regelwerk
+    </footer>
+
+    <script>
+        fetch('../info/regeln.txt')
+            .then(res => res.text())
+            .then(text => {
+                const container = document.getElementById('rulesContainer');
+                const sections = text.split(/\n\s*\n/);
+
+                sections.forEach(section => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.style.marginBottom = "25px";
+                    card.style.textAlign = "center";
+                    card.innerHTML = section.replace(/\n/g, "<br>");
+                    container.appendChild(card);
+                });
+            })
+            .catch(() => {
+                document.getElementById('rulesContainer').innerHTML =
+                    "<div class='card'>Fehler: Regeln konnten nicht geladen werden.</div>";
+            });
+    </script>
+
+</body>
+</html>
