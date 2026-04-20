@@ -33,6 +33,12 @@ body {
     box-shadow: 0 0 20px rgba(0, 255, 255, 0.05);
 }
 
+/* Cursor-Fix für klickbare Elemente */
+.navbar .logo,
+.navbar .nav-links a {
+    cursor: pointer;
+}
+
 .logo {
     font-size: 1.6rem;
     font-weight: bold;
