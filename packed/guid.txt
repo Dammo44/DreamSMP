@@ -1,0 +1,11 @@
+<-_-> 
+Willkommen im Gilden-System des DreamSMP.
+Hier findest du alle Informationen zu Gilden, Rängen und Funktionen.
+
+<-_-> 
+Gilden-Icon:
+<BILD:packed/server-icon.png>
+
+<-_-> 
+Mehr Infos:
+<KLICK:WEB:https://www.google.com;google webseite>

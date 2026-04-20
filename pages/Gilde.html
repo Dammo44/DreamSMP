@@ -1,0 +1,47 @@
+<header class="hero">
+    <h1>🏰 Gilden</h1>
+    <p>Informationen aus packed/guid.txt</p>
+</header>
+
+<section class="section" id="guildContainer"></section>
+
+<footer class="footer">
+    © 2026 DreamSMP – Gilden
+</footer>
+
+<script>
+    fetch('../packed/guid.txt')
+        .then(res => res.text())
+        .then(text => {
+            const container = document.getElementById('guildContainer');
+
+            // Blöcke anhand von "<-_->_" trennen
+            const blocks = text.split('<-_->').map(b => b.trim()).filter(b => b.length > 0);
+
+            blocks.forEach(block => {
+                let html = block;
+
+                // Bild-Code ersetzen
+                html = html.replace(/<BILD:(.*?)>/g, (match, path) => {
+                    return `<img src="../${path}" style="max-width:150px; margin:10px auto; display:block;">`;
+                });
+
+                // Klickbarer Web-Link
+                html = html.replace(/<KLICK:WEB:(.*?);(.*?)>/g, (match, url, text) => {
+                    return `<a href="${url}" target="_blank" style="color:var(--neon); text-decoration:none;">${text}</a>`;
+                });
+
+                // Block als Card einfügen
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.textAlign = "center";
+                card.innerHTML = html.replace(/\n/g, "<br>");
+
+                container.appendChild(card);
+            });
+        })
+        .catch(() => {
+            document.getElementById('guildContainer').innerHTML =
+                "<div class='card'>Fehler: guid.txt konnte nicht geladen werden.</div>";
+        });
+</script>
