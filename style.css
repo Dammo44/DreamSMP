@@ -206,3 +206,21 @@ th, td {
     border-top: 1px solid var(--border);
     margin-top: 40px;
 }
+/* Klick-Cursor erzwingen */
+.navbar .nav-item {
+    cursor: pointer !important;
+    user-select: none;
+}
+
+/* Aktive Seite */
+.navbar .nav-item.active {
+    color: var(--neon);
+    text-shadow: 0 0 12px var(--neon);
+    font-weight: bold;
+}
+
+/* Hover-Effekt */
+.navbar .nav-item:hover {
+    color: var(--neon);
+    text-shadow: 0 0 8px var(--neon);
+}
