@@ -8,17 +8,3 @@
         <li><a class="nav-item" data-page="pages/rules.html">Regeln</a></li>
     </ul>
 </nav>
-
-<script>
-    // Navigation anklickbar machen
-    document.querySelectorAll(".nav-item").forEach(item => {
-        item.addEventListener("click", () => {
-            const page = item.getAttribute("data-page");
-            loadInto("page", page);
-
-            // Aktive Klasse setzen
-            document.querySelectorAll(".nav-item").forEach(i => i.classList.remove("active"));
-            item.classList.add("active");
-        });
-    });
-</script>
